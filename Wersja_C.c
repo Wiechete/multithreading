@@ -30,11 +30,11 @@ void free_matrix(float **matrix, int n) {
 void version_C(float **A, float **B, float **C, int n, int r) {
     #pragma omp parallel
     {
-        for (int i = 0; i < n; i += r) {
-            for (int j = 0; j < n; j += r) {
-                for (int k = 0; k < n; k += r) {
+        for (int i = 0; i < n; i += r) { // wszystkie wiersze bloków
+            for (int j = 0; j < n; j += r) { // kolejny wiersz bloków
+                for (int k = 0; k < n; k += r) { // wynik bloku RxR
                     #pragma omp for
-                    for (int ii = i; ii < i + r; ii++) {
+                    for (int ii = i; ii < i + r; ii++) { // wynik czêœciowy blok
                         for (int kk = k; kk < k + r; kk++) {
                             for (int jj = j; jj < j + r; jj++) {
                                 C[ii][jj] += A[ii][kk] * B[kk][jj];
