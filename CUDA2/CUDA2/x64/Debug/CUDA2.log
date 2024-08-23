@@ -1,0 +1,3 @@
+﻿  cpu_computation.cpp
+C:\Users\danwi\Desktop\pulpit\folder_virtualbox\multithreading\CUDA2\cpu_computation.cpp(12,40): warning C4244: "+=": konwersja z "double" do "float", możliwa utrata danych
+  CUDA2.vcxproj -> C:\Users\danwi\Desktop\pulpit\folder_virtualbox\multithreading\CUDA2\x64\Debug\CUDA2.exe
