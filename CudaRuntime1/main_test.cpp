@@ -5,6 +5,83 @@
 #include "gpu_code.h"
 #include <chrono>
 
+// Testowanie nasycenia obliczeniami
+void testSaturation() {
+    const int BS = 16; // Przyk³adowa wartoœæ BS
+    const int R_values[] = { 8, 32 }; // Przyk³adowe wartoœci R: mniejsze i wiêksze od BS
+    const int N_values[] = { 64, 128, 256, 512, 1024, 2048 }; // Przyk³adowe wartoœci N
+
+    for (int R : R_values) {
+        for (int N : N_values) {
+            if (N > 2 * R) {
+                std::vector<float> TAB(N * N, 0.0f);
+                std::vector<float> OUT_GPU((N - 2 * R) * (N - 2 * R), 0.0f);
+
+                // Przygotowanie danych wejœciowych
+                for (int i = 0; i < N; ++i) {
+                    for (int j = 0; j < N; ++j) {
+                        TAB[i * N + j] = static_cast<float>(i * N + j);
+                    }
+                }
+
+                auto start_gpu = std::chrono::high_resolution_clock::now();
+                cudaError_t cudaStatus = computeSumGPU(TAB.data(), OUT_GPU.data(), N, R, BS, true, 1);
+                auto end_gpu = std::chrono::high_resolution_clock::now();
+
+                if (cudaStatus != cudaSuccess) {
+                    std::cerr << "computeSumGPU failed!" << std::endl;
+                    return;
+                }
+
+                double time_gpu = std::chrono::duration<double>(end_gpu - start_gpu).count();
+                int OUT_size = N - 2 * R;
+                double flops_gpu = (double)(OUT_size * OUT_size * (2 * R + 1) * (2 * R + 1)) / time_gpu;
+
+                std::cout << "N: " << N << ", R: " << R
+                    << ", Time GPU: " << time_gpu << " s"
+                    << ", GPU FLOP/s: " << flops_gpu << std::endl;
+            }
+        }
+    }
+}
+
+// Testowanie wp³ywu parametru k
+void testImpactK() {
+    const int N = 1024; // Przyk³adowa wartoœæ N
+    const int R = 16; // Przyk³adowa wartoœæ R
+    const int BS = 16; // Przyk³adowa wartoœæ BS
+    const int k_values[] = { 1, 2, 4 }; // Wartoœci k
+
+    for (int k : k_values) {
+        std::vector<float> TAB(N * N, 0.0f);
+        std::vector<float> OUT_GPU((N - 2 * R) * (N - 2 * R), 0.0f);
+
+        // Przygotowanie danych wejœciowych
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                TAB[i * N + j] = static_cast<float>(i * N + j);
+            }
+        }
+
+        auto start_gpu = std::chrono::high_resolution_clock::now();
+        cudaError_t cudaStatus = computeSumGPU(TAB.data(), OUT_GPU.data(), N, R, BS, true, k);
+        auto end_gpu = std::chrono::high_resolution_clock::now();
+
+        if (cudaStatus != cudaSuccess) {
+            std::cerr << "computeSumGPU failed!" << std::endl;
+            return;
+        }
+
+        double time_gpu = std::chrono::duration<double>(end_gpu - start_gpu).count();
+        int OUT_size = N - 2 * R;
+        double flops_gpu = (double)(OUT_size * OUT_size * (2 * R + 1) * (2 * R + 1)) / time_gpu;
+
+        std::cout << "N: " << N << ", R: " << R << ", k: " << k
+            << ", Time GPU: " << time_gpu << " s"
+            << ", GPU FLOP/s: " << flops_gpu << std::endl;
+    }
+}
+
 int main() {
     const int N = 1024; // Przyk³adowa wiêksza wartoœæ N
     const int R1 = 2;
@@ -12,6 +89,17 @@ int main() {
     const int BS_values[] = { 8, 16, 32 };
     const int k_values[] = { 1, 2, 4 };
 
+    std::cout << "Testowanie nasycenia obliczeniami:" << std::endl;
+    // Testowanie nasycenia obliczeniami
+    testSaturation();
+    std::cout << std::endl;
+
+    std::cout << "Testowanie wplywu parametru k:" << std::endl;
+    // Testowanie wp³ywu parametru k
+    testImpactK();
+    std::cout << std::endl;
+
+    std::cout << "wyniki:" << std::endl;
     // Przygotowanie danych wejœciowych
     std::vector<float> TAB(N * N, 0.0f);
     for (int i = 0; i < N; ++i) {
