@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath> // Do funkcji fabs
 #include "cpu_code.h"
 #include "gpu_code.h"
 #include <chrono>
@@ -48,12 +49,22 @@ int main() {
                     double flops_cpu = (double)(OUT_size * OUT_size * (2 * R + 1) * (2 * R + 1)) / time_cpu;
                     double flops_gpu = (double)(OUT_size * OUT_size * (2 * R + 1) * (2 * R + 1)) / time_gpu;
 
+                    // Porównanie wyników CPU i GPU
+                    bool resultsMatch = true;
+                    for (int i = 0; i < OUT_CPU.size(); ++i) {
+                        if (fabs(OUT_CPU[i] - OUT_GPU[i]) > 1e-5) { // Mo¿esz dostosowaæ tolerancjê b³êdu
+                            resultsMatch = false;
+                            break;
+                        }
+                    }
+
                     std::cout << "BS: " << BS << ", R: " << R << ", k: " << k
                         << ", Efficient: " << (efficient ? "Yes" : "No")
                         << ", Time CPU: " << time_cpu << " s"
                         << ", Time GPU: " << time_gpu << " s"
                         << ", CPU FLOP/s: " << flops_cpu
-                        << ", GPU FLOP/s: " << flops_gpu << std::endl;
+                        << ", GPU FLOP/s: " << flops_gpu
+                        << ", Results Match: " << (resultsMatch ? "Yes" : "No") << std::endl;
                 }
             }
         }
