@@ -4,6 +4,6 @@
 
 #include <cuda_runtime.h>
 
-cudaError_t computeSumGPU(const float* TAB, float* OUT, int N, int R);
+cudaError_t computeSumGPU(const float* TAB, float* OUT, int N, int R, int BS, bool efficient, int k);
 
 #endif
