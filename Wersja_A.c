@@ -28,10 +28,9 @@ void free_matrix(float **matrix, int n) {
 }
 
 void version_A(float **A, float **B, float **C, int n) {
-    #pragma omp parallel for
     for (int i = 0; i < n; i++) { // Przechodzi przez wiersze macierzy A
-        for (int j = 0; j < n; j++) { // Przechodzi przez kolumny macierzy B
-            for (int k = 0; k < n; k++) { // Mno¿y i sumuje odpowiednie elementy wiersza z A i kolumny z B
+        for (int k = 0; k < n; k++) { // Przechodzi przez kolumny macierzy B
+            for (int j = 0; j < n; j++) { // Mno¿y i sumuje odpowiednie elementy wiersza z A i kolumny z B
                 C[i][j] += A[i][k] * B[k][j];
             }
         }
