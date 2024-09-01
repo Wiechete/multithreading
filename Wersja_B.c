@@ -28,6 +28,7 @@ void free_matrix(float **matrix, int n) {
 }
 
 void version_B(float **A, float **B, float **C, int n, int r) {
+	#pragma omp parallel for
     for ( int j = 0 ; j < n ; j+=r) // iteracje po pionowych pasach wyniku
 		for ( int i = 0 ; i < n ; i++) // wyznaczenie niebieskiej czêœci wyniku
 			for (int k = 0 ; k < n ; k++) // wyznaczenie br¹zowej czêœci wyniku
